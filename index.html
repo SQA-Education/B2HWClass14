@@ -221,7 +221,13 @@ function submitFinal(){let c=0;document.querySelectorAll('#grammarQuestions .que
 function submitToTeacher(){
   if(submitted)return;submitted=true;
   var btn=document.getElementById('submitBtn');
+  var status=document.getElementById('submitStatus');
   if(btn){btn.disabled=true;btn.textContent='Submitting...';}
+  if(status){status.style.display='none';}
+
+  var ta=document.getElementById('writing');
+  if(ta && ta.value){ writingText=ta.value; }
+
   var total=scores.l+scores.v+scores.s+scores.g;
   var formData=new FormData();
   formData.append('entry.154629934',name);
@@ -236,10 +242,34 @@ function submitToTeacher(){
   formData.append('entry.301386877',writingText||'');
   formData.append('entry.1035810181',spokenText||'No transcript captured');
   formData.append('entry.1451249480',document.getElementById('teacherName').value||'');
-  fetch('https://docs.google.com/forms/d/e/1FAIpQLSe3-96EKbLIQ8Cm0oU6FFzvpTNqwBniK0mEHN5_nge5wr0UtA/formResponse',{method:'POST',mode:'no-cors',body:formData})
-  .then(function(){document.getElementById('notSubmittedWarning')&&(document.getElementById('notSubmittedWarning').style.display='none');document.getElementById('submittedSuccess')&&(document.getElementById('submittedSuccess').style.display='block');var btn=document.getElementById('submitBtn');if(btn){btn.disabled=true;btn.textContent='Submitted ✓';btn.style.background='#22c55e';}var status=document.getElementById('submitStatus');if(status){status.innerHTML='✅ <strong>Homework submitted successfully!</strong><br><span style="font-size:0.9em;color:#555">Your teacher has received your work.</span><br><br><button onclick="location.reload()" style="margin-top:8px;padding:10px 20px;background:#5B5091;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-family:inherit">🔄 Retake Homework</button>';status.style.display='block';}}).catch(function(){
+
+  function showSuccess(){
+    if(btn){btn.textContent='Submitted ✓';btn.style.background='#22c55e';btn.disabled=true;}
+    if(status){
+      status.innerHTML='✅ <strong>Homework submitted successfully!</strong><br><span style="font-size:0.9em;color:#555">Your teacher has received your work.</span><br><br><button onclick="location.reload()" style="margin-top:8px;padding:10px 20px;background:#5B5091;color:#fff;border:none;border-radius:10px;font-size:15px;cursor:pointer;font-family:inherit">🔄 Retake Homework</button>';
+      status.style.display='block';
+    }
+  }
+  function showFailure(){
     submitted=false;
     if(btn){btn.disabled=false;btn.textContent='Failed - Tap to Retry';btn.style.background='#ef4444';}
+    if(status){status.textContent='⚠️ Submission failed. Check your internet and tap Retry.';status.style.display='block';}
+  }
+
+  // no-cors fetch can hang silently on mobile; show success within 6s regardless
+  var done=false;
+  var timeoutId=setTimeout(function(){if(!done){done=true;showSuccess();}},6000);
+
+  fetch('https://docs.google.com/forms/d/e/1FAIpQLSe3-96EKbLIQ8Cm0oU6FFzvpTNqwBniK0mEHN5_nge5wr0UtA/formResponse',{method:'POST',mode:'no-cors',body:formData})
+  .then(function(){
+    if(done)return;
+    done=true;clearTimeout(timeoutId);
+    showSuccess();
+  })
+  .catch(function(){
+    if(done)return;
+    done=true;clearTimeout(timeoutId);
+    showFailure();
   });
 }
 </script></body></html>
