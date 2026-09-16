@@ -117,7 +117,7 @@ When things get stressful, I..."></textarea>
 let submitted=false;
 function setTeacher(sel){var opt=sel.options[sel.selectedIndex];document.getElementById('teacherName').value=opt?(opt.getAttribute('data-teacher')||''):''}
 const SESSION='14';
-let name='',scores={l:0,v:0,w:0,s:0,g:0},writingText='',spokenText='';
+let name='',scores={l:0,v:0,w:0,s:0,g:0},writingText='',spokenText='';try{window.scores=scores;}catch(e){}
 let selectedWord=null,isRec=false,recTime=0,recTimer=null,recognition=null;
 let readingAnswers=[],grammarAnswers=[];
 const readingQBank=[{q:"Which strengths does Lina mention?",opts:["Collaborative, detail-oriented, and patient","Competitive, emotional, and insecure","Risk-averse, disorganized, and overwhelmed"],correct:0},{q:"What used to make Lina feel insecure?",opts:["Large presentations","Writing emails","Meeting one person"],correct:0},{q:"How does Lina handle stress?",opts:["She makes a task list and prioritizes work","She ignores the problem","She works silently without planning"],correct:0},{q:"What do employers want to hear?",opts:["Honest, thoughtful answers with examples","Perfect answers with no details","Very short yes/no answers"],correct:0},{q:"How has Lina improved one weakness?",opts:["By practicing presentations at work","By quitting difficult tasks","By avoiding people"],correct:0}];
@@ -426,7 +426,7 @@ try{
     document.body.appendChild(bar);
     document.getElementById('sqa-fresh').onclick=function(){localStorage.removeItem(KEY);bar.remove();};
     document.getElementById('sqa-resume').onclick=function(){try{
-      for(var k in st.g){try{window[k]=st.g[k];}catch(e){}}
+      for(var k in st.g){try{if(window[k]&&typeof window[k]==='object'&&st.g[k]&&typeof st.g[k]==='object'&&!Array.isArray(window[k])){for(var kk in st.g[k])window[k][kk]=st.g[k][kk];}else{window[k]=st.g[k];}}catch(e){}}
       for(var id in st.h){var el=document.getElementById(id);if(el)el.innerHTML=st.h[id];}
       var fs=fields();(st.f||[]).forEach(function(v,i){if(fs[i]!==undefined){try{fs[i].value=v;}catch(e){}}});
       var wc=document.getElementById('wc'),wr=document.getElementById('writing');if(wc&&wr)try{wc.textContent=wr.value.trim().split(/\s+/).filter(Boolean).length;}catch(e){}
